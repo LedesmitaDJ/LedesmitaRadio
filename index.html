@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>Ledesmita Radio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('fondo.gif');
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-size: cover;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        #player {
+            margin: 20px;
+            padding: 20px;
+            background-color: #f2f2f2;
+			border: 5px solid #007bff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #player audio {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #station-title {
+            font-size: 18px;
+            font-weight: bold;
+            color:black ;
+            margin-bottom: 10px;
+        }
+        #station-title p {
+			font-weight: bold;
+			margin: 15px 0px 0px 0px;
+        }
+        #station-logo {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        p {
+			margin: 5px 0px 0px 0px;
+			color: black;
+            font-weight: bold;
+		}
+
+		#embeddedPageContainer {
+            display: block;
+			margin-top: 20px;
+		}
+
+		#embeddedPage {
+            display: none;
+			width: 100%;
+			height: 400px;
+			border: none;
+		}
+
+		#chat {
+			margin: 10px;
+			width: auto;
+			background-color: grey;
+			border: 5px solid #007bff;
+			border-radius: 10px;
+			padding: 10px;
+		}
+        @media (min-width: 768px) {
+            #player {
+                width: 400px;
+                margin: 50px auto;
+            }
+            #chat {
+                width: 400px;
+                margin: 50px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="player">
+        <div id="station-info">
+            <div id="station-title">Cargando Emisoras</div>
+            <img id="station-logo" src="https://media.tenor.com/G7LfW0O5qb8AAAAi/loading-gif.gif" alt="Logo de la Emisora">
+        </div>
+        <audio id="audioPlayer" autoplay controls loop>
+            <source src="Loading-Song.mp3" type="audio/mpeg">
+            Tu navegador no soporta la reproducción de audio.
+        </audio>
+        <div id="controls">
+            <button class="button" onclick="changeStation(-1)">Anterior</button>
+            <button class="button" onclick="changeStation(1)">Siguiente</button>
+            <br>
+            <button id="linkToPage" class="button" onclick="redirectToPage()">Descargar</button>
+            <br>
+            <br>
+            <p>¿No se escucha?¿No funciona?</p>
+            <button class="button" id="visitWebsite">¡Reportar!</button>
+            <br>
+            <button class="button" onclick="shareStation()">Compartir</button>
+        </div>
+    </div>
+
+    <div id="chat">
+        <p>Chat</p>
+        <div id="embeddedPageContainer">
+            <iframe id="embeddedPage" src="https://chitchatter.im/public/ff89008d-b1b7-451d-94db-f03159395bc0?embed=1"></iframe>
+        </div>
+        <button class="button" onclick="toggleEmbeddedPage()">(Mostrar/Ocultar)</button>
+    </div>
+
+    <script>
+        // Array de emisoras
+        var stations = [
+            { title: "Ledesmita Radio", logo: "Ledesmita-Radio-Logo.png", stream: "https://stream.zeno.fm/ha2a04fsbdkvv", link: "https://play.google.com/store/apps/details?id=ledesmita.radio" },
+            { title: "Ledesmita Radio ALT", logo: "Ledesmita-Radio-ALT-Logo.png", stream: "https://stream.zeno.fm/oovkww7udvmvv", link: "https://play.google.com/store/apps/details?id=ledesmita.radio" },
+            { title: "NCS Radio", logo: "NCS-Radio-Logo.jpg", stream: "https://stream.zeno.fm/1crah5hlmvatv", link: "https://www.appcreator24.com/app1669055-zs67m1" },
+            { title: "San Andreas Radio", logo: "San-Andreas-Radio-Logo.png", stream: "https://stream.zeno.fm/rkbc6rkfw7cuv", link: "https://play.google.com/store/apps/details?id=sanandreas.radio" },
+            { title: "World Cup Radio", logo: "World-Cup-Radio-Logo.png", stream: "https://stream.zeno.fm/kwpnu0zn9hvtv", link: "https://play.google.com/store/apps/details?id=worldcup.radio" },
+            // Agrega más emisoras según sea necesario
+        ];
+
+        // Índice de la emisora actual
+        var currentStationIndex = 0;
+
+        // Función para cambiar de emisora
+        function changeStation(direction) {
+            currentStationIndex += direction;
+            if (currentStationIndex < 0) {
+                currentStationIndex = stations.length - 1;
+            } else if (currentStationIndex >= stations.length) {
+                currentStationIndex = 0;
+            }
+            var station = stations[currentStationIndex];
+            document.getElementById("audioPlayer").src = station.stream;
+            document.getElementById("station-title").textContent = station.title;
+            document.getElementById("station-logo").src = station.logo;
+            document.getElementById("linkToPage").setAttribute("onclick", "redirectToPage('" + station.link + "')");
+        }
+
+        // Función para redirigir a la página
+        function redirectToPage() {
+            var currentStation = stations[currentStationIndex];
+            window.open(currentStation.link, '_blank');
+        }
+
+        // Agregar evento de clic para el botón de visitar el sitio web
+			document.getElementById('visitWebsite').addEventListener('click', function () {
+				window.location.href = "go:Reportar";
+			});
+
+        // Función para mostrar u ocultar la página incrustada
+        function toggleEmbeddedPage() {
+            var iframe = document.getElementById("embeddedPage");
+            iframe.style.display = (iframe.style.display === "none") ? "block" : "none";
+        }
+
+        // Función para compartir la emisora
+        function shareStation() {
+            var currentStation = stations[currentStationIndex];
+            var shareText = 'Escuchando ' + currentStation.title + ' en vivo: ' + currentStation.stream;
+            if (navigator.share) {
+                navigator.share({
+                    title: currentStation.title,
+                    text: shareText,
+                    url: currentStation.stream,
+                }).then(() => {
+                    console.log('Contenido compartido exitosamente');
+                }).catch((error) => {
+                    console.error('Error al compartir:', error);
+                });
+            } else {
+                alert('Tu navegador no soporta la función de compartir.');
+            }
+        }
+
+        // Cargar la primera emisora al iniciar la página
+        window.onload = function() {
+            var initialStation = stations[currentStationIndex];
+            document.getElementById("audioPlayer").src = initialStation.stream;
+            document.getElementById("station-title").textContent = initialStation.title;
+            document.getElementById("station-logo").src = initialStation.logo;
+            document.getElementById("linkToPage").setAttribute("onclick", "redirectToPage()");
+        };
+    </script>
+</body>
+</html>
